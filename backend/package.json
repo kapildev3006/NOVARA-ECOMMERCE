@@ -1,0 +1,45 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "seed": "tsx --tsconfig tsconfig.seed.json scripts/seed.ts",
+    "lint": "tsc --noEmit -p tsconfig.json",
+    "bootstrap-admin": "tsx scripts/bootstrap-superadmin.ts",
+    "test:socket": "tsx scripts/test-socket.ts",
+    "test:phase25": "tsx scripts/test-phase25.ts",
+    "test:phase26": "tsx scripts/test-phase26.ts",
+    "seed:homepage": "tsx --tsconfig tsconfig.seed.json scripts/seed-homepage.ts",
+    "test:phase27": "tsx scripts/test-phase27.ts",
+    "test:phase31": "tsx scripts/test-phase31.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.2",
+    "socket.io": "^4.8.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.2.0",
+    "socket.io-client": "^4.8.3",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

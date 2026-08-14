@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const product_1 = require("../controllers/product");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate, (0, auth_1.requireRole)("Admin", "SuperAdmin"));
+router.post("/", product_1.createAdminProduct);
+router.patch("/:id", product_1.updateAdminProduct);
+router.delete("/:id", product_1.deleteAdminProduct);
+router.patch("/:id/stock", product_1.updateAdminProductStock);
+exports.default = router;

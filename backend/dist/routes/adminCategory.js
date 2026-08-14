@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const category_1 = require("../controllers/category");
+const auth_1 = require("../middleware/auth");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate, (0, auth_1.requireRole)("Admin", "SuperAdmin"));
+router.post("/", category_1.createAdminCategory);
+router.patch("/:id", category_1.updateAdminCategory);
+router.delete("/:id", category_1.deleteAdminCategory);
+exports.default = router;
