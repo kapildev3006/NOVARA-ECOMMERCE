@@ -872,7 +872,7 @@ export default function AdminHomepageManager() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isMutating || !scheduleDate || !scheduleTime || (qaResult && !qaResult.valid)}
+                  disabled={Boolean(isMutating || !scheduleDate || !scheduleTime || (qaResult && !qaResult.valid))}
                   className="flex-1 bg-indigo-600 text-white font-bold py-2.5 rounded-xl hover:bg-indigo-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50"
                 >
                   {isMutating ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Confirm Schedule"}
