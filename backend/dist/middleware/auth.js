@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireRole = exports.authenticate = void 0;
+exports.requirePermission = exports.requireRole = exports.authenticate = void 0;
 const jwt_1 = require("../utils/jwt");
 const User_1 = require("../models/User");
 const authenticate = async (req, res, next) => {
@@ -13,11 +13,14 @@ const authenticate = async (req, res, next) => {
         try {
             const decoded = (0, jwt_1.verifyAccessToken)(token);
             // Optionally verify user is still active in DB
-            const user = await User_1.User.findById(decoded.userId).select("status");
+            const user = await User_1.User.findById(decoded.userId).select("status permissions");
             if (!user || user.status !== "Active") {
                 return res.status(403).json({ success: false, error: { code: "FORBIDDEN", message: "User is inactive or deleted" } });
             }
-            req.user = decoded;
+            req.user = {
+                ...decoded,
+                permissions: user.permissions,
+            };
             next();
         }
         catch (err) {
@@ -42,3 +45,22 @@ const requireRole = (...roles) => {
     };
 };
 exports.requireRole = requireRole;
+const requirePermission = (...permissions) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({ success: false, error: { code: "UNAUTHORIZED", message: "Not authenticated" } });
+        }
+        // SuperAdmin bypass
+        if (req.user.role === "SuperAdmin") {
+            return next();
+        }
+        const userPermissions = req.user.permissions || [];
+        // Check if user has ALL of the required permissions
+        const hasPermission = permissions.every(p => userPermissions.includes(p));
+        if (!hasPermission) {
+            return res.status(403).json({ success: false, error: { code: "FORBIDDEN", message: "You do not have permission to perform this action." } });
+        }
+        next();
+    };
+};
+exports.requirePermission = requirePermission;

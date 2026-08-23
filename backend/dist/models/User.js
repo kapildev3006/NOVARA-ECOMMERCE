@@ -41,6 +41,7 @@ const UserSchema = new mongoose_1.Schema({
     phone: { type: String },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["Customer", "Admin", "SuperAdmin"], default: "Customer" },
+    permissions: { type: [String], default: undefined },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
 }, { timestamps: true });
 exports.User = mongoose_1.default.models.User || mongoose_1.default.model("User", UserSchema);

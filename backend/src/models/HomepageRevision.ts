@@ -3,10 +3,14 @@ import { IHomepageSection } from "./HomepageSection";
 
 export interface IHomepageRevision extends Document {
   revisionId: number;
-  status: "draft" | "published";
+  status: "draft" | "published" | "scheduled" | "cancelled" | "executing";
   sections: mongoose.Types.DocumentArray<IHomepageSection>;
   publishedAt?: Date;
   publishedBy?: mongoose.Types.ObjectId;
+  rollbackFromRevisionId?: number;
+  scheduledPublishAt?: Date;
+  scheduledBy?: mongoose.Types.ObjectId;
+  scheduledAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,10 +33,14 @@ const EmbeddedSectionSchema = new Schema(
 const HomepageRevisionSchema = new Schema<IHomepageRevision>(
   {
     revisionId: { type: Number, required: true, unique: true },
-    status: { type: String, enum: ["draft", "published"], required: true },
+    status: { type: String, enum: ["draft", "published", "scheduled", "cancelled", "executing"], required: true },
     sections: [EmbeddedSectionSchema],
     publishedAt: { type: Date },
     publishedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    rollbackFromRevisionId: { type: Number },
+    scheduledPublishAt: { type: Date },
+    scheduledBy: { type: Schema.Types.ObjectId, ref: "User" },
+    scheduledAt: { type: Date },
   },
   { timestamps: true }
 );

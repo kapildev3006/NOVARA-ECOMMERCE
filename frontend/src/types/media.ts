@@ -4,4 +4,6 @@ export interface UploadedImage {
   width?: number;
   height?: number;
   format?: string;
+  assetKey?: string;
+  altText?: string;
 }

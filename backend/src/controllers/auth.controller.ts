@@ -61,7 +61,7 @@ export const register = async (req: Request, res: Response) => {
 
     setRefreshCookie(res, refreshToken);
 
-    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
     return res.status(201).json({ success: true, data: { user: safeUser, accessToken } });
   } catch (error: any) {
     if (error instanceof ZodError) {
@@ -103,7 +103,7 @@ export const login = async (req: Request, res: Response) => {
 
     setRefreshCookie(res, refreshToken);
 
-    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
     return res.json({ success: true, data: { user: safeUser, accessToken } });
   } catch (error: any) {
     if (error instanceof ZodError) {
@@ -191,7 +191,7 @@ export const me = async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "User not found" } });
     }
 
-    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+    const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
     return res.json({ success: true, data: { user: safeUser } });
   } catch (error) {
     console.error("Me error:", error);

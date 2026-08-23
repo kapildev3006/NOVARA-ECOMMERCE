@@ -12,9 +12,14 @@ const adminCategory_1 = __importDefault(require("./routes/adminCategory"));
 const adminProduct_1 = __importDefault(require("./routes/adminProduct"));
 const homepage_1 = __importDefault(require("./routes/homepage"));
 const adminHomepage_1 = __importDefault(require("./routes/adminHomepage"));
+const adminUsers_1 = __importDefault(require("./routes/adminUsers"));
+const adminMedia_1 = __importDefault(require("./routes/adminMedia"));
+const adminHomepageAnalytics_1 = __importDefault(require("./routes/adminHomepageAnalytics"));
+const requestId_1 = require("./middleware/requestId");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
+app.use(requestId_1.requestIdMiddleware);
 // Basic development request logging
 app.use((req, res, next) => {
     if (process.env.NODE_ENV === "development") {
@@ -38,8 +43,11 @@ app.use("/api/v1/categories", category_1.default);
 app.use("/api/v1/products", product_1.default);
 app.use("/api/v1/admin/categories", adminCategory_1.default);
 app.use("/api/v1/admin/products", adminProduct_1.default);
+app.use("/api/v1/admin/users", adminUsers_1.default);
 app.use("/api/v1/homepage", homepage_1.default);
+app.use("/api/v1/admin/homepage/analytics", adminHomepageAnalytics_1.default);
 app.use("/api/v1/admin/homepage", adminHomepage_1.default);
+app.use("/api/v1/admin/media", adminMedia_1.default);
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "Endpoint not found" } });

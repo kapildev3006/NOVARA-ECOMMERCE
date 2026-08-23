@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { fetchHomepageAuditLogs, HomepageAuditLog, PaginatedAuditLogs } from "../../../../lib/admin-homepage-audit-api";
-import { useAuth } from "../../../../hooks/useAuth";
 import { getSocket } from "../../../../lib/socket";
 import Link from "next/link";
-import { format } from "date-fns";
+import { usePermissions } from "@/context/PermissionsContext";
+import { ShieldAlert } from "lucide-react";
 
 export default function AdminHomepageAuditPage() {
-  const { user } = useAuth();
   const [data, setData] = useState<PaginatedAuditLogs | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [hasNewActivity, setHasNewActivity] = useState(false);
+  const { can, isLoading: isPermissionsLoading } = usePermissions();
   const limit = 20;
 
   const loadLogs = async (p: number) => {
@@ -35,10 +35,11 @@ export default function AdminHomepageAuditPage() {
   };
 
   useEffect(() => {
-    if (!user) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadLogs(page);
-  }, [user, page]);
+    if (!isPermissionsLoading && can("homepage.audit.view")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      loadLogs(page);
+    }
+  }, [page, isPermissionsLoading, can]);
 
   useEffect(() => {
     const socket = getSocket();
@@ -53,15 +54,12 @@ export default function AdminHomepageAuditPage() {
     };
   }, []);
 
-  if (!user || (user.role !== "Admin" && user.role !== "SuperAdmin")) {
-    return <div className="p-8">Access Denied</div>;
-  }
 
   const renderChanges = (log: HomepageAuditLog) => {
     if (log.action === "DELETE") {
       return (
         <span className="text-gray-500 italic text-sm">
-          Deleted {log.metadata?.deletedTitle || log.metadata?.deletedType || "section"}
+          Deleted {(log.metadata?.deletedTitle as string) || (log.metadata?.deletedType as string) || "section"}
         </span>
       );
     }
@@ -69,7 +67,7 @@ export default function AdminHomepageAuditPage() {
     if (log.action === "REORDER") {
       return (
         <span className="text-gray-500 italic text-sm">
-          Reordered {log.metadata?.items?.length || 0} items
+          Reordered {(log.metadata?.items as unknown[])?.length || 0} items
         </span>
       );
     }
@@ -100,6 +98,20 @@ export default function AdminHomepageAuditPage() {
       </div>
     );
   };
+
+  if (isPermissionsLoading) return null;
+
+  if (!can("homepage.audit.view")) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center h-[50vh]">
+        <ShieldAlert className="w-16 h-16 text-gray-300 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
+        <p className="text-gray-500 max-w-md">
+          You do not have permission to view the audit trail. Please contact a SuperAdmin if you need access.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -165,7 +177,7 @@ export default function AdminHomepageAuditPage() {
                 data?.items.map((log) => (
                   <tr key={log._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {format(new Date(log.createdAt), "MMM d, yyyy HH:mm")}
+                      {new Intl.DateTimeFormat("en-US", { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(log.createdAt))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold

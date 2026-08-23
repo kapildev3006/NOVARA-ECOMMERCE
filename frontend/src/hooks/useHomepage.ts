@@ -11,12 +11,13 @@ export function useHomepage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchHomepage = useCallback(async (abortController?: AbortController) => {
+  const fetchHomepage = useCallback(async (abortController?: AbortController, source?: string) => {
     setIsLoading(true);
     setError(null);
     try {
       // Execute the fetch
-      const sections = await getHomepageSections();
+      const queryParams = source ? `?source=${source}` : "";
+      const sections = await getHomepageSections(queryParams);
       
       // Defensively ensure only enabled sections are shown and they are sorted correctly
       const activeSortedSections = sections
@@ -64,7 +65,7 @@ export function useHomepage() {
     const handleHomepageUpdate = (payload?: { version: string }) => {
       console.log("Received homepage_updated event, refetching...", payload);
       // Trigger a refetch without a hard abort controller for the subsequent pulls
-      fetchHomepage();
+      fetchHomepage(undefined, "socket");
     };
 
     socket.on("homepage_updated", handleHomepageUpdate);

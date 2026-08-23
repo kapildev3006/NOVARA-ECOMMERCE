@@ -6,6 +6,7 @@ export interface IUser extends Document {
   phone?: string;
   passwordHash: string;
   role: "Customer" | "Admin" | "SuperAdmin";
+  permissions?: string[];
   status: "Active" | "Inactive";
   createdAt: Date;
   updatedAt: Date;
@@ -18,6 +19,7 @@ const UserSchema = new Schema<IUser>(
     phone: { type: String },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["Customer", "Admin", "SuperAdmin"], default: "Customer" },
+    permissions: { type: [String], default: undefined },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
   },
   { timestamps: true }

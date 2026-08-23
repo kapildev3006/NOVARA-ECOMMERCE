@@ -5,16 +5,26 @@ import { HomepageSectionRenderer } from "@/components/home/HomepageSectionRender
 import { HomepageSection } from "@/types/homepage";
 import { API_BASE_URL } from "@/lib/api-config";
 import { Loader2, AlertTriangle, ArrowLeft } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
-export default function AdminHomepagePreview() {
+import { Suspense } from "react";
+
+function PreviewContent() {
   const [sections, setSections] = useState<HomepageSection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const searchParams = useSearchParams();
+  const revisionId = searchParams.get("revisionId");
+
   useEffect(() => {
     async function fetchPreview() {
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/homepage/preview`, {
+        const endpoint = revisionId 
+          ? `/admin/homepage/revisions/${revisionId}/preview`
+          : `/admin/homepage/preview`;
+          
+        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
           credentials: "include",
         });
         const json = await res.json();
@@ -24,7 +34,7 @@ export default function AdminHomepagePreview() {
         }
 
         if (json.success && Array.isArray(json.data)) {
-          setSections(json.data.map((backendSection: any) => ({
+          setSections(json.data.map((backendSection: Record<string, unknown>) => ({
             _id: backendSection._id,
             id: backendSection.sectionKey,
             type: backendSection.type,
@@ -36,15 +46,16 @@ export default function AdminHomepagePreview() {
             config: backendSection.config,
           })));
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch preview");
+      } catch (err: unknown) {
+        const error = err as Record<string, unknown>;
+        setError((error.message as string) || "Failed to fetch preview");
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchPreview();
-  }, []);
+  }, [revisionId]);
 
   if (isLoading) {
     return (
@@ -79,10 +90,12 @@ export default function AdminHomepagePreview() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
           </span>
-          <p className="font-bold text-sm">PREVIEW MODE</p>
+          <p className="font-bold text-sm">
+            {revisionId ? `HISTORICAL REVISION PREVIEW (Revision #${revisionId})` : "DRAFT PREVIEW"}
+          </p>
         </div>
         <p className="text-sm text-gray-400 hidden sm:block">
-          This layout is a draft and is not visible to customers.
+          {revisionId ? "This is a past version of the homepage." : "This layout is a draft and is not visible to customers."}
         </p>
         <a 
           href="/admin/homepage" 
@@ -103,5 +116,18 @@ export default function AdminHomepagePreview() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminHomepagePreview() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+        <p className="mt-4 text-gray-500 font-medium">Loading preview...</p>
+      </div>
+    }>
+      <PreviewContent />
+    </Suspense>
   );
 }

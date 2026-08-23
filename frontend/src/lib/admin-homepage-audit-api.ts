@@ -1,4 +1,4 @@
-import { fetchWithAuth } from "./api";
+import { API_BASE_URL } from "./api-config";
 
 export interface HomepageAuditLog {
   _id: string;
@@ -29,22 +29,18 @@ export class AdminHomepageAuditAPIError extends Error {
   }
 }
 
-export async function fetchHomepageAuditLogs(
-  page = 1,
-  limit = 20,
-  action?: string,
-  sectionId?: string,
-  actorId?: string
-): Promise<PaginatedAuditLogs> {
-  const query = new URLSearchParams({
-    page: page.toString(),
-    limit: limit.toString(),
-  });
-  if (action) query.append("action", action);
-  if (sectionId) query.append("sectionId", sectionId);
-  if (actorId) query.append("actorId", actorId);
+export async function fetchHomepageAuditLogs(page: number = 1, limit: number = 20): Promise<PaginatedAuditLogs> {
+  const url = new URL(`${API_BASE_URL}/admin/homepage/audit`);
+  url.searchParams.append("page", page.toString());
+  url.searchParams.append("limit", limit.toString());
 
-  const res = await fetchWithAuth(`/admin/homepage/audit?${query.toString()}`);
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
 
   if (!res.ok) {
     let message = res.statusText;

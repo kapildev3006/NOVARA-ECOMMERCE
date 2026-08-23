@@ -56,7 +56,7 @@ const register = async (req, res) => {
             ipAddress: req.ip,
         });
         setRefreshCookie(res, refreshToken);
-        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
         return res.status(201).json({ success: true, data: { user: safeUser, accessToken } });
     }
     catch (error) {
@@ -92,7 +92,7 @@ const login = async (req, res) => {
             ipAddress: req.ip,
         });
         setRefreshCookie(res, refreshToken);
-        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
         return res.json({ success: true, data: { user: safeUser, accessToken } });
     }
     catch (error) {
@@ -170,7 +170,7 @@ const me = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "User not found" } });
         }
-        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status };
+        const safeUser = { id: user.id, fullName: user.fullName, email: user.email, phone: user.phone, role: user.role, status: user.status, permissions: user.permissions || [] };
         return res.json({ success: true, data: { user: safeUser } });
     }
     catch (error) {

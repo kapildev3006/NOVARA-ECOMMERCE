@@ -4,6 +4,7 @@ import { config } from "../config/env";
 import { verifyAccessToken } from "../utils/jwt";
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents, SocketData } from "./events";
 import { User } from "../models/User";
+import { recordSocketMetric } from "../utils/homepageMetrics";
 
 let io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
@@ -122,5 +123,8 @@ export const emitToAll = <Ev extends keyof ServerToClientEvents>(
 ) => {
   if (io) {
     (io.emit as any)(event, payload);
+    if (event === "homepage_updated") {
+      recordSocketMetric("emitted");
+    }
   }
 };

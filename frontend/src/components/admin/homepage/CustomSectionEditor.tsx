@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { X, Check, Search, AlertCircle } from "lucide-react";
 import { HomepageSection, CustomSectionConfig } from "@/types/homepage";
-import { ImageUploader } from "@/components/admin/media/ImageUploader";
+import { MediaPicker } from "@/components/admin/media/MediaPicker";
 import { getAdminProducts } from "@/lib/admin-product-store";
 import { getAdminCategories } from "@/lib/admin-category-store";
 import { Product } from "@/types/product";
@@ -259,7 +259,7 @@ export function CustomSectionEditor({ isOpen, onClose, section, onSave }: Custom
             {/* Media */}
             <div className="space-y-4 border-t border-[#e5e5e5] pt-6">
               <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Media</h4>
-              <ImageUploader value={image?.url} onChange={(url, img) => setImage(img)} />
+              <MediaPicker value={image?.url} onChange={(url, img) => setImage(img)} />
             </div>
 
             {/* Content */}

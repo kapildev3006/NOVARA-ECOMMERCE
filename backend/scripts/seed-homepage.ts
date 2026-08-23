@@ -2,81 +2,11 @@ import mongoose from "mongoose";
 import { config, validateEnv } from "../src/config/env";
 import { HomepageSection } from "../src/models/HomepageSection";
 import { HomepageRevision } from "../src/models/HomepageRevision";
+import { Counter } from "../src/models/Counter";
 
-// Independent canonical backend seed data
-const predefinedHomepageSections = [
-  {
-    sectionKey: "announcement",
-    type: "announcement",
-    enabled: true,
-    order: 0,
-    isProtected: true, // As per prompt, all predefined/core sections must be marked isProtected: true
-    config: {
-      text: "Free shipping on orders over $50",
-    },
-  },
-  {
-    sectionKey: "hero",
-    type: "hero",
-    enabled: true,
-    order: 1,
-    isProtected: true,
-  },
-  {
-    sectionKey: "service-bar",
-    type: "service-bar",
-    enabled: true,
-    order: 2,
-    isProtected: true,
-  },
-  {
-    sectionKey: "categories",
-    type: "categories",
-    enabled: true,
-    order: 3,
-    isProtected: true,
-  },
-  {
-    sectionKey: "carousel-deals",
-    type: "product-carousel",
-    title: "Deals of the Day",
-    enabled: true,
-    order: 4,
-    isProtected: true,
-    config: {
-      collection: "deals",
-    },
-  },
-  {
-    sectionKey: "carousel-arrivals",
-    type: "product-carousel",
-    title: "New Arrivals",
-    enabled: true,
-    order: 5,
-    isProtected: true,
-    config: {
-      collection: "new",
-    },
-  },
-  {
-    sectionKey: "carousel-bestsellers",
-    type: "product-carousel",
-    title: "Best Sellers",
-    enabled: true,
-    order: 6,
-    isProtected: true,
-    config: {
-      collection: "bestsellers",
-    },
-  },
-  {
-    sectionKey: "promo-banner",
-    type: "promo-banner",
-    enabled: true,
-    order: 7,
-    isProtected: true,
-  },
-];
+import { CANONICAL_HOMEPAGE_SECTIONS } from "../src/constants/homepage";
+
+const predefinedHomepageSections = CANONICAL_HOMEPAGE_SECTIONS;
 
 export const seedHomepage = async () => {
   console.log("Seeding homepage sections...");
@@ -112,7 +42,22 @@ export const seedHomepage = async () => {
   let draftRevision = await HomepageRevision.findOne({ status: "draft" });
   if (!draftRevision) {
     const lastRev = await HomepageRevision.findOne().sort({ revisionId: -1 });
-    const nextRevId = lastRev ? lastRev.revisionId + 1 : 1;
+    const maxRevisionId = lastRev ? lastRev.revisionId : 0;
+    
+    // Sync the counter sequence to the existing maximum (idempotent, using $max)
+    await Counter.findByIdAndUpdate(
+      "homepageRevision",
+      { $max: { sequence: maxRevisionId } },
+      { upsert: true }
+    );
+    
+    const counter = await Counter.findByIdAndUpdate(
+      "homepageRevision",
+      { $inc: { sequence: 1 } },
+      { new: true, upsert: true }
+    );
+    
+    const nextRevId = counter.sequence;
     await HomepageRevision.create({
       revisionId: nextRevId,
       status: "draft",
@@ -121,11 +66,19 @@ export const seedHomepage = async () => {
     console.log(`✓ Initialized draft revision #${nextRevId}`);
   } else {
     // Sync the draft revision with the live seed if needed
-    // The prompt says "seed script will be strictly responsible for establishing the baseline draft."
-    // If a draft already exists, we overwrite its sections with the live sections to ensure baseline consistency.
-    draftRevision.sections = liveSections as any;
-    await draftRevision.save();
+    await HomepageRevision.updateOne(
+      { _id: draftRevision._id },
+      { $set: { sections: liveSections as any } }
+    );
     console.log(`✓ Synced draft revision #${draftRevision.revisionId} with seed`);
+    
+    const lastRev = await HomepageRevision.findOne().sort({ revisionId: -1 });
+    const maxRevisionId = lastRev ? lastRev.revisionId : 0;
+    await Counter.findByIdAndUpdate(
+      "homepageRevision",
+      { $max: { sequence: maxRevisionId } },
+      { upsert: true }
+    );
   }
 };
 

@@ -1,0 +1,10 @@
+npx tsx scripts/test-phase26.ts
+npx tsx scripts/test-phase27.ts
+npx tsx scripts/test-phase31.ts
+npx tsx scripts/test-phase32.ts
+npx tsx scripts/test-phase33.ts
+npx tsx scripts/test-phase34.ts
+npx tsx scripts/test-phase35.ts
+npx tsx scripts/test-phase36.ts
+npx tsx scripts/test-phase37.ts
+npx tsx scripts/test-phase38.ts

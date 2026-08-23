@@ -7,6 +7,9 @@ import adminCategoryRoutes from "./routes/adminCategory";
 import adminProductRoutes from "./routes/adminProduct";
 import homepageRoutes from "./routes/homepage";
 import adminHomepageRoutes from "./routes/adminHomepage";
+import adminUsersRoutes from "./routes/adminUsers";
+import adminMediaRoutes from "./routes/adminMedia";
+import adminHomepageAnalyticsRoutes from "./routes/adminHomepageAnalytics";
 
 import { requestIdMiddleware } from "./middleware/requestId";
 
@@ -41,8 +44,11 @@ app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/admin/categories", adminCategoryRoutes);
 app.use("/api/v1/admin/products", adminProductRoutes);
+app.use("/api/v1/admin/users", adminUsersRoutes);
 app.use("/api/v1/homepage", homepageRoutes);
+app.use("/api/v1/admin/homepage/analytics", adminHomepageAnalyticsRoutes);
 app.use("/api/v1/admin/homepage", adminHomepageRoutes);
+app.use("/api/v1/admin/media", adminMediaRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -16,9 +16,12 @@ import {
   Settings2,
   X,
   LineChart,
-  LayoutTemplate
+  LayoutTemplate,
+  Image,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePermissions } from "@/context/PermissionsContext";
 
 const MAIN_NAV = [
   { name: "Dashboard", href: "/admin", icon: Home },
@@ -29,6 +32,8 @@ const MAIN_NAV = [
   { name: "Inventory", href: "/admin/inventory", icon: BarChart2 },
   { name: "Analytics", href: "/admin/analytics", icon: LineChart },
   { name: "Homepage", href: "/admin/homepage", icon: LayoutTemplate },
+  { name: "CMS Analytics", href: "/admin/homepage/analytics", icon: Activity },
+  { name: "Media", href: "/admin/homepage/media", icon: Image },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -41,6 +46,7 @@ const QUICK_ACTIONS = [
 
 export function AdminSidebar({ onClose }: { onClose: () => void }) {
   const pathname = usePathname();
+  const { can, isLoading: isPermissionsLoading } = usePermissions();
 
   return (
     <div className="flex flex-col h-full bg-white text-[#161513]">
@@ -63,6 +69,19 @@ export function AdminSidebar({ onClose }: { onClose: () => void }) {
       <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8 scrollbar-hide">
         <nav className="space-y-1.5">
           {MAIN_NAV.map((item) => {
+            // Wait until permissions load
+            if (isPermissionsLoading) return null;
+
+            // Gate Homepage and Media links behind homepage.view permission
+            if ((item.name === "Homepage" || item.name === "Media") && !can("homepage.view")) {
+              return null;
+            }
+
+            // Gate CMS Analytics behind homepage.analytics.view
+            if (item.name === "CMS Analytics" && !can("homepage.analytics.view")) {
+              return null;
+            }
+            
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (

@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 interface AuditLogParams {
   req: Request;
-  action: "CREATE" | "UPDATE" | "DELETE" | "REORDER" | "SEED";
+  action: "CREATE" | "UPDATE" | "DELETE" | "REORDER" | "SEED" | "PUBLISH" | "ROLLBACK" | "SCHEDULE" | "SCHEDULE_CANCEL" | "SCHEDULE_EXECUTE" | "CAMPAIGN_CREATE" | "CAMPAIGN_UPDATE" | "CAMPAIGN_CANCEL" | "CAMPAIGN_ACTIVATE" | "CAMPAIGN_COMPLETE" | "PERMISSION_GRANT" | "PERMISSION_REVOKE" | "MEDIA_UPLOAD" | "MEDIA_UPDATE" | "MEDIA_DELETE";
   sectionId?: mongoose.Types.ObjectId | string;
   sectionKey?: string;
   changes?: Record<string, any>;

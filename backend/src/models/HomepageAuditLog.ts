@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { config } from "../config/env";
 
 export interface IHomepageAuditLog extends Document {
-  action: "CREATE" | "UPDATE" | "DELETE" | "REORDER" | "SEED" | "PUBLISH";
+  action: "CREATE" | "UPDATE" | "DELETE" | "REORDER" | "SEED" | "PUBLISH" | "ROLLBACK" | "SCHEDULE" | "SCHEDULE_CANCEL" | "SCHEDULE_EXECUTE" | "CAMPAIGN_CREATE" | "CAMPAIGN_UPDATE" | "CAMPAIGN_CANCEL" | "CAMPAIGN_ACTIVATE" | "CAMPAIGN_COMPLETE" | "PERMISSION_GRANT" | "PERMISSION_REVOKE" | "MEDIA_UPLOAD" | "MEDIA_UPDATE" | "MEDIA_DELETE";
   sectionId?: mongoose.Types.ObjectId;
   sectionKey?: string;
   actorId?: mongoose.Types.ObjectId | string;
@@ -15,7 +15,7 @@ export interface IHomepageAuditLog extends Document {
 const HomepageAuditLogSchema = new Schema<IHomepageAuditLog>({
   action: {
     type: String,
-    enum: ["CREATE", "UPDATE", "DELETE", "REORDER", "SEED", "PUBLISH"],
+    enum: ["CREATE", "UPDATE", "DELETE", "REORDER", "SEED", "PUBLISH", "ROLLBACK", "SCHEDULE", "SCHEDULE_CANCEL", "SCHEDULE_EXECUTE", "CAMPAIGN_CREATE", "CAMPAIGN_UPDATE", "CAMPAIGN_CANCEL", "CAMPAIGN_ACTIVATE", "CAMPAIGN_COMPLETE", "PERMISSION_GRANT", "PERMISSION_REVOKE", "MEDIA_UPLOAD", "MEDIA_UPDATE", "MEDIA_DELETE"],
     required: true,
   },
   sectionId: {

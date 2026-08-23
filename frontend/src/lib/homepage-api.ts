@@ -11,11 +11,11 @@ interface BackendHomepageSection {
   enabled: boolean;
   order: number;
   isProtected?: boolean;
-  config?: any;
+  config?: Record<string, unknown>;
 }
 
-export async function getHomepageSections(): Promise<HomepageSection[]> {
-  const response = await fetch(`${API_BASE_URL}/homepage`, {
+export async function getHomepageSections(queryParams: string = ""): Promise<HomepageSection[]> {
+  const response = await fetch(`${API_BASE_URL}/homepage${queryParams}`, {
     headers: {
       "Content-Type": "application/json",
     },

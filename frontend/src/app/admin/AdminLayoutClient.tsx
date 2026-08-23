@@ -4,12 +4,14 @@ import { useState } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { cn } from "@/lib/utils";
+import { PermissionsProvider } from "@/context/PermissionsContext";
 
 export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#FAFAF8] overflow-hidden font-sans text-[#161513]">
+    <PermissionsProvider>
+      <div className="flex h-screen bg-[#FAFAF8] overflow-hidden font-sans text-[#161513]">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -36,6 +38,7 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </PermissionsProvider>
   );
 }

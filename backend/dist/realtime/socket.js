@@ -5,6 +5,7 @@ const socket_io_1 = require("socket.io");
 const env_1 = require("../config/env");
 const jwt_1 = require("../utils/jwt");
 const User_1 = require("../models/User");
+const homepageMetrics_1 = require("../utils/homepageMetrics");
 let io;
 const initializeSocket = (server) => {
     const corsOrigin = env_1.config.NODE_ENV === "production"
@@ -91,6 +92,9 @@ exports.emitToOrder = emitToOrder;
 const emitToAll = (event, payload) => {
     if (io) {
         io.emit(event, payload);
+        if (event === "homepage_updated") {
+            (0, homepageMetrics_1.recordSocketMetric)("emitted");
+        }
     }
 };
 exports.emitToAll = emitToAll;

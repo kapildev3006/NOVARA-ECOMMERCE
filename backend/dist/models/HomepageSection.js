@@ -33,9 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HomepageSection = void 0;
+exports.HomepageSection = exports.HomepageSectionSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const HomepageSectionSchema = new mongoose_1.Schema({
+exports.HomepageSectionSchema = new mongoose_1.Schema({
     sectionKey: { type: String, required: true, unique: true },
     type: { type: String, required: true },
     title: { type: String },
@@ -45,5 +45,5 @@ const HomepageSectionSchema = new mongoose_1.Schema({
     isProtected: { type: Boolean, default: false },
     config: { type: mongoose_1.Schema.Types.Mixed },
 }, { timestamps: true });
-HomepageSectionSchema.index({ enabled: 1, order: 1 });
-exports.HomepageSection = mongoose_1.default.models.HomepageSection || mongoose_1.default.model("HomepageSection", HomepageSectionSchema);
+exports.HomepageSectionSchema.index({ enabled: 1, order: 1 });
+exports.HomepageSection = mongoose_1.default.models.HomepageSection || mongoose_1.default.model("HomepageSection", exports.HomepageSectionSchema);
